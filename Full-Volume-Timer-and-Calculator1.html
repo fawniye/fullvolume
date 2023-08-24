@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<!-- saved from url=(0102)https://www.studentroboticseducation.com/wp-content/uploads/2022/07/Splashot-Timer-and-Calculator.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<script>
+
+let secRem = 4;
+let interval;
+let readyToStart = true;
+let inCountDown = true;
+let startSound = new Audio("https://www.studentroboticseducation.com/wp-content/uploads/2022/07/Match-start-sound.mp3")
+let endSound = new Audio("https://www.studentroboticseducation.com/wp-content/uploads/2022/07/Match-end-sound.mp3")
+let switchSound = new Audio("https://www.studentroboticseducation.com/wp-content/uploads/2022/07/Match-driver-switch-sound.mp3")
+let shortBeep = new Audio("https://www.studentroboticseducation.com/wp-content/uploads/2022/07/Short-beep.mp3")
+let enableCountdown = true;
+
+function calculateScores() {
+	let score = 0;
+	let scoreInvalid = false;
+	const redCubes = document.getElementById("redKnock").value;
+	const totalCubes = document.getElementById("cubesScored").value;
+	const uniformGoals = document.getElementById("uniformGoals").value;
+	const goalLevel = document.getElementById("goalLevel").value;
+	const supplyBonus = document.getElementById("supplyBonus").value;
+	const parkingBonus1 = document.getElementById("parkingBonus1").value;
+	const parkingBonus2 = document.getElementById("parkingBonus2").value;
+	const scoreKey = [5,1,10,10,20,5,5];
+	let matchData = [redCubes,totalCubes,uniformGoals,goalLevel,supplyBonus,parkingBonus1,parkingBonus2];
+	matchData = matchData.map(function (currentElement) {
+		return currentElement == "" ? 0 : parseInt(currentElement);
+	});
+	for(let i=0;i<7;i++)
+	{
+		score += matchData[i] * scoreKey[i];
+	}
+	
+	if(parkingBonus1 == 2 && parkingBonus2 == 2)
+	{
+		score += 10;
+	}
+	scoreInvalid = (Math.min.apply(Math, matchData) < 0 || matchData[0] > 3 || matchData[1] > 73 || matchData[2] > 3 || matchData[3] > 3 || matchData[2] > matchData[1] || (matchData[3] != 0 && matchData[1]<3));
+	if(scoreInvalid) {
+		document.getElementById("finalScore").style.color = "red";
+		document.getElementById("finalScore").innerHTML = "Illegal Score: "+score.toString();
+	} else {
+		document.getElementById("finalScore").style.color = "white";
+		document.getElementById("finalScore").innerHTML = "Score: "+score.toString();
+	}
+}
+
+function clearFields() {
+	document.getElementById("redKnock").value = "";
+	document.getElementById("cubesScored").value = "";
+	document.getElementById("uniformGoals").value = "";
+	document.getElementById("goalLevel").value = "";
+	document.getElementById("supplyBonus").value = 0;
+	document.getElementById("parkingBonus1").value = 0;
+	document.getElementById("parkingBonus2").value = 0;
+	calculateScores();
+}
+
+function resetTimer() {
+	clearInterval(interval);
+	//secRem = 4;
+	readyToStart = true;
+	//inCountDown = true;
+	document.getElementById("timerDisp").innerHTML = "60 Seconds";
+}
+
+function stopTimer() {
+	clearInterval(interval);
+	endSound.play();
+	if(secRem >= 0) {
+		readyToStart = true;
+	}
+}
+
+function startTimer() {
+	if(readyToStart) {
+		if(enableCountdown) {
+			secRem = 4;
+			inCountDown = true;
+		} else {
+			secRem = 1;
+			inCountDown = true;
+		}
+		timerCount();
+		interval = setInterval(timerCount, 1000);
+		readyToStart = false;
+	}
+}
+
+function timerCount() {
+	secRem -= 1;
+	if(secRem == 25 || secRem == 35) {
+		switchSound.play();
+	}
+	if(secRem <= 0) {
+		if(inCountDown) {
+			secRem = 60;
+			inCountDown = false;
+			startSound.play();
+		} else {
+			stopTimer();
+		}
+	}
+	if(inCountDown) {shortBeep.play();}
+	document.getElementById("timerDisp").innerHTML = secRem.toString()+" Seconds";
+}
+	
+
+
+function switchToTimer() {
+	document.getElementById("slapshotCalculator").style.display = "none";
+	document.getElementById("vexiqTimer").style.display = "block";
+}
+function switchToCalc() {
+	document.getElementById("slapshotCalculator").style.display = "block";
+	document.getElementById("vexiqTimer").style.display = "none";
+}
+
+function switchCountdown() {
+	if(enableCountdown) {
+		document.getElementById("countdownSwitch").innerHTML = "Enable Countdown";
+	} else {
+		document.getElementById("countdownSwitch").innerHTML = "Disable Countdown";
+	}
+	enableCountdown = !enableCountdown;
+}
+
+
+
+</script>
+</head>
+
+<body>
+
+<style>
+body {
+	background:#222;
+	font-family: arial;
+	color:white;
+}
+
+label {
+	font-size:18px;
+}
+input {
+	background: #ddd;
+	width: 50px;
+	height: 20px;
+	font-size:16px;
+	border:0.2px solid black;
+}
+select {
+	background: #ddd;
+	width: 100px;
+	height: 25px;
+	font-size:16px;
+	border:0.2px solid black;
+}
+
+.tmrbtn {
+	width: 180px;
+	font-size: 30px;
+	border-radius: 10px;
+	padding: 20px 10px;
+	margin: 10px 10px;
+	background-color: #222;
+	transition-duration: 0.4s;
+	cursor: pointer;
+	border: 4px;
+}
+.widebtn {
+	width: 590px;
+	font-size: 20px;
+	border-radius: 10px;
+	padding: 10px 10px;
+	margin: 10px 10px;
+	background-color: #222;
+	transition-duration: 0.4s;
+	cursor: pointer;
+}
+button:hover {
+	color: white;
+}
+
+.btnblu {
+	border: 4px solid #45f;
+	color:#45f;
+}
+.btnblu:hover {
+	background-color: #45f;
+}
+.btngrn {
+	border: 4px solid #1d1;
+	color:#1d1;
+}
+.btngrn:hover {
+	background-color: #1d1;
+}
+.btnred {
+	border: 4px solid #f33;
+	color:#f33;
+}
+.btnred:hover {
+	background-color: #f33;
+}
+.btnwht {
+	border: 4px solid white;
+	color:white;
+}
+.btnwht:hover {
+	background-color: white;
+	color:black;
+}
+.thinborder {
+	border: 1px solid;
+}
+
+table, th, td {
+  border: none;
+  border-collapse: collapse;
+  padding: 50px;
+}
+
+.centered_calc {
+   width: 620px;
+   height: 600px;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   margin-left: -310px;
+   margin-top: -300px;
+}
+
+.centered_timer {
+   width: 620px;
+   height: 400px;
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   margin-left: -310px;
+   margin-top: -200px;
+}
+
+</style>
+<center>
+<!--Calculator code-->
+<div id="slapshotCalculator" class="centered_calc" style="display: block;">
+<center>
+<h1 id="calcTitle">VEX IQ Score Calculator</h1>
+<form>
+<label for="redKnock" id="redKnockLabel" min="0" max="3">Red cubes removed</label>
+<input type="number" id="redKnock" placeholder="0" onkeyup="calculateScores()" onchange="calculateScores()">
+<br><br>
+<label for="cubesScored" id="cubesScoredLabel">Total cubes scored</label>
+<input type="number" id="cubesScored" placeholder="0" onkeyup="calculateScores()" onchange="calculateScores()">
+<br><br>
+<label for="uniformGoals" id="uniformGoalsLabel">Total uniform goals</label>
+<input type="number" id="uniformGoals" placeholder="0" onkeyup="calculateScores()" onchange="calculateScores()">
+<br><br>
+<label for="goalLevel" id="goalLevelLabel">Level of lowest goal</label>
+<input type="number" id="goalLevel" placeholder="0" onkeyup="calculateScores()" onchange="calculateScores()">
+<br><br>
+<label for="supplyBonus" id="supplyBonusLabel">Supply zone</label>
+<Select id="supplyBonus" style="width: 125px" onchange="calculateScores()">
+<option value="0">Not cleared</option>
+<option value="1">Cleared</option>
+</select>
+<br><br>
+<label for="parkingBonus" id="parkingBonusLabel">Parking</label>
+<select id="parkingBonus1" onchange="calculateScores()">
+<option value="0">None</option>
+<option value="1">Partial</option>
+<option value="2">Complete</option>
+</select>
+<select id="parkingBonus2" onchange="calculateScores()">
+<option value="0">None</option>
+<option value="1">Partial</option>
+<option value="2">Complete</option>
+</select>
+</form>
+<!--<button onClick="calculateScores()">Calculate!</button>-->
+<h1 id="finalScore" style="font-size:60px; margin:5px;">Score: 0</h1>
+<button class="widebtn btnred thinborder" onclick="clearFields()">Clear Fields</button><br>
+<button class="widebtn btnwht thinborder" onclick="switchToTimer()">Match Timer</button>
+</center>
+</div>
+<!--Timer code-->
+<div id="vexiqTimer" class="centered_timer" style="display: none;">
+<center>
+<h1 id="timerTitle">VEX IQ Match Timer</h1>
+<p>
+<span id="timerDisp" style="font-size:100px;">60 Seconds</span>
+<br><br>
+<button onclick="startTimer()" class="tmrbtn btngrn">Start</button>
+<button onclick="stopTimer()" class="tmrbtn btnred">Stop</button>
+<button onclick="resetTimer()" class="tmrbtn btnblu">Reset</button>
+<br>
+<button id="countdownSwitch" class="widebtn btnwht thinborder" onclick="switchCountdown()">Disable Countdown</button>
+<br>
+<button class="widebtn btnwht thinborder" onclick="switchToCalc()">Score Calculator</button>
+
+</p>
+</center>
+</div>
+</center>
+<script>switchToCalc();</script>
+
+</body></html>
